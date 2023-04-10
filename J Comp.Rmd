@@ -1,0 +1,108 @@
+---
+title: "DV J-Comp"
+author: "Vishal N"
+date: "2023-03-09"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Reading the csv and storing it in a dataframe df.
+```{r}
+list.files()
+df = read.csv("./datasets/data.csv")
+```
+
+
+
+Partial df is a subset for a specific state.
+```{r}
+p_df = subset(df, State.Name=="Andhra Pradesh")
+```
+
+Pre processing
+```{r}
+df=unique(p_df)
+head(p_df)
+```
+
+
+```{r}
+no_na=complete.cases(p_df)
+p_df=p_df[no_na,]
+head(p_df)
+```
+
+```{r}
+col_names=colnames(p_df)
+zeroes=col_names[31:95]
+```
+
+
+
+```{r}
+pp_p_df = p_df
+for(col in zeroes){
+  for(i in seq(1,nrow(pp_p_df),1)){
+    if (as.double(pp_p_df[i,col]) == 0.0){
+      #print(df[i,col])
+      if(i >1 && pp_p_df[i-1,6]==p_df[i,6] ){#  && pp_p_df[i-1,col] != 0&& pp_p_df[i+1,col] != 0){
+      avg = (as.double(pp_p_df[i - 1,col]) + as.double(pp_p_df[i+1,col]))/2
+      #print(avg)
+      pp_p_df[i,col]= avg
+      }
+    }
+  }
+}
+head(pp_p_df)
+```
+
+
+```{r}
+cult_land_based_on_rainfall = lm(NET.CROPPED.AREA..1000.ha. ~ ANNUAL.RAINFALL..Millimeters.,data=pp_p_df)
+summary(cult_land_based_on_rainfall)
+
+# plot(cult_land_based_on_rainfall)
+
+plot(pp_p_df$ANNUAL.RAINFALL..Millimeters., pp_p_df$NET.CROPPED.AREA..1000.ha.)
+abline(cult_land_based_on_rainfall)
+```
+👆 Slope is negative so crops suffer in excess rain in AP.
+
+
+
+Multiple regresison for predicting Maize production based on MAIZE.AREA..1000.ha. , MAIZE.IRRIGATED.AREA..1000.ha., ANNUAL.RAINFALL..Millimeters., LAND.PUT.TO.NONAGRICULTURAL.USE.AREA..1000.ha., PERMANENT.PASTURES.AREA..1000.ha. , NET.CROPPED.AREA..1000.ha. , 
+```{r}
+# pp_p_df = subset(pp_p_df, GROUNDNUT.AREA..1000.ha. < 400)
+ground_pred = lm(pp_p_df$GROUNDNUT.AREA..1000.ha. ~ Year,data=pp_p_df)
+# plot(maize_pred)
+
+cat("\nCo-effs are ", ground_pred$coefficients, "\n")
+
+plot(pp_p_df$Year, pp_p_df$GROUNDNUT.AREA..1000.ha.)
+abline(ground_pred)
+```
+
+```{r}
+pp_p_df = subset(pp_p_df, GROUNDNUT.PRODUCTION..1000.tons. < 400)
+ground_pred = lm(pp_p_df$GROUNDNUT.PRODUCTION..1000.tons. ~ pp_p_df$GROUNDNUT.IRRIGATED.AREA..1000.ha. + pp_p_df$ANNUAL.RAINFALL..Millimeters. + pp_p_df$LAND.PUT.TO.NONAGRICULTURAL.USE.AREA..1000.ha. + pp_p_df$PERMANENT.PASTURES.AREA..1000.ha. + pp_p_df$NET.CROPPED.AREA..1000.ha.,data=pp_p_df)
+# plot(maize_pred)
+
+cat("\nCo-effs are ", ground_pred$coefficients, "\n")
+
+plot(pp_p_df$GROUNDNUT.PRODUCTION..1000.tons.,pp_p_df$GROUNDNUT.IRRIGATED.AREA..1000.ha. + pp_p_df$ANNUAL.RAINFALL..Millimeters. + pp_p_df$LAND.PUT.TO.NONAGRICULTURAL.USE.AREA..1000.ha. + pp_p_df$PERMANENT.PASTURES.AREA..1000.ha. + pp_p_df$NET.CROPPED.AREA..1000.ha.)
+abline(ground_pred)
+```
+
+```{r}
+rice_pred = lm(pp_p_df$RICE.PRODUCTION..1000.tons. ~ pp_p_df$RICE.IRRIGATED.AREA..1000.ha. + pp_p_df$ANNUAL.RAINFALL..Millimeters. + pp_p_df$LAND.PUT.TO.NONAGRICULTURAL.USE.AREA..1000.ha. + pp_p_df$PERMANENT.PASTURES.AREA..1000.ha. + pp_p_df$NET.CROPPED.AREA..1000.ha.,data=pp_p_df)
+# plot(maize_pred)
+
+cat("\nCo-effs are ", rice_pred$coefficients, "\n")
+
+plot(pp_p_df$RICE.PRODUCTION..1000.tons.,pp_p_df$RICE.IRRIGATED.AREA..1000.ha. + pp_p_df$ANNUAL.RAINFALL..Millimeters. + pp_p_df$LAND.PUT.TO.NONAGRICULTURAL.USE.AREA..1000.ha. + pp_p_df$PERMANENT.PASTURES.AREA..1000.ha. + pp_p_df$NET.CROPPED.AREA..1000.ha.)
+abline(rice_pred)
+```

@@ -1,0 +1,59 @@
+---
+title: "Datavis proj"
+author: "20BCE1317 G.S.Jyothssena"
+date: "2023-02-28"
+output: html_document
+---
+
+```{r}
+df=read.csv("./datasets/data.csv")
+```
+
+
+```{r}
+df=unique(df)
+df
+```
+
+
+```{r}
+no_na=complete.cases(df)
+df=df[no_na,]
+df
+```
+
+
+```{r}
+col_names=colnames(df)
+zeroes=col_names[31:95]
+```
+
+```{r}
+data=df
+for(col in zeroes){
+  out <- boxplot.stats(df[,col])$out
+  out_ind <- which(df[,col] %in% c(out))
+  data=data[-out_ind,]
+}
+data
+```
+
+
+
+```{r}
+
+for(col in zeroes){
+  for(i in seq(1,nrow(df),1)){
+    if (as.double(df[i,col]) == 0.0){
+      #print(df[i,col])
+      if(i >2 && df[i-2,6]==df[i,6]){
+      avg = (as.double(df[i - 1,col]) + as.double(df[i-2,col]))/2
+      #print(avg)
+      df[i,col]= avg
+      }
+    }
+  }
+}
+df
+```
+

@@ -1,9 +1,14 @@
 import csv
 from hashlib import sha256
-from os import listdir
+from os import listdir, path
 from time import sleep
 
-filenames = [file for file in listdir() if file.endswith(".csv") and file != "data.csv"]
+filenames = [
+    file
+    for file in listdir()
+    if file.endswith(".csv")
+    and file != path.dirname(__file__) + "/../datasets/data.csv"
+]
 defaults = [0]
 
 data: list[list] = []

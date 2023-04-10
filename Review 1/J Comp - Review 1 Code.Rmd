@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Reading the csv and storing it in a dataframe df.
 ```{r}
 list.files()
-df = read.csv("./datasets/data.csv")
+df = read.csv("./../datasets/data.csv")
 ```
 
 

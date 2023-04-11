@@ -11,6 +11,6 @@ Submission for the project component of the Data Visualisation (CSE3020) course 
 
 
 ## Team members:
-20BCE1043 - Vishal N
-20BCE1360 - Prathiba N
-20BCE1317 - Jyothssena GS
+1. 20BCE1043 - Vishal N
+2. 20BCE1317 - Jyothssena GS
+3. 20BCE1360 - Prathiba N
